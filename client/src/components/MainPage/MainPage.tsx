@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './mainPage.module.css';
 
 export default function MainPage() {
@@ -8,15 +8,26 @@ export default function MainPage() {
     const [selectedDevice, setSelectedDevice] = useState('Logitech G Pro');
     const [activeTab, setActiveTab] = useState<'doubleClick' | 'scroll' | 'polling'>('doubleClick');
 
+    const lastClickTimeRef = useRef<number | null>(null);
+    const [minInterval, setMinInterval] = useState<number | null>(null);
+
     useEffect(() => {
         setClickCount(0);
         setDoubleClicks(0);
     }, [selectedDevice]);
 
     const handleTestAreaClick = () => {
+        const currentTime = performance.now();
         setClickCount((prev) => prev + 1);
+        if (lastClickTimeRef.current !== null) {
+            const interval = Math.round(currentTime - lastClickTimeRef.current);
+            if (interval < 80) {
+                setDoubleClicks((prev) => prev + 1);
+            }
+            setMinInterval((prevMin) => (prevMin === null ? interval : Math.min(prevMin, interval)))
+        }
+        lastClickTimeRef.current = currentTime;
     }
-
     const handleReset = (e: React.MouseEvent) => {
         e.stopPropagation();
         setClickCount(0);
@@ -93,12 +104,12 @@ export default function MainPage() {
                         </div>
                         <div className={styles.metricCard}>
                             <span className={styles.metricLabel}>Min Interval</span>
-                            <div className={styles.metricValue}>0 ms</div>
+                            <div className={styles.metricValue}>{minInterval}</div>
                         </div>
                         <div className={styles.metricCard}>
                             <span className={styles.metricLabel}>Status</span>
-                            <div className={`${styles.metricValue} ${styles.textOk}`} style={{ fontSize: '16px' }}>
-                                ✓ Healthy
+                            <div className={`${styles.metricValue} ${doubleClicks > 0 ? styles.textWarning : styles.textOk}`} style={{ fontSize: '16px' }}>
+                                {`${doubleClicks > 0 ? 'Defective': 'Healthy'}`}
                             </div>
                         </div>
                     </div>
