@@ -7,7 +7,7 @@ export default function MainPage() {
 
     const [selectedDevice, setSelectedDevice] = useState('Logitech G Pro');
     const [minInterval, setMinInterval] = useState<number | null>(null);
-    const [activeTab, setActiveTab] = useState<'doubleClick' | 'scroll' | 'polling'>('doubleClick');
+    const [activeTab, setActiveTab] = useState<'doubleClick' | 'scroll'>('doubleClick');
 
     const lastClickTimeRef = useRef<number | null>(null);
     const lastScrollTimeRef = useRef<number | null>(null);
@@ -121,12 +121,6 @@ export default function MainPage() {
                 >
                     🔄 Scroll Encoder Test
                 </button>
-                <button
-                    onClick={() => setActiveTab('polling')}
-                    className={`${styles.tabBtn} ${activeTab === 'polling' ? styles.active : ''}`}
-                >
-                    📊 Polling Rate (Hz)
-                </button>
             </div>
 
             <div className={styles.grid}>
@@ -235,7 +229,7 @@ export default function MainPage() {
                         <p className={styles.cardText}>
                             Submit these results to the Node.js backend to contribute to global hardware metrics.
                         </p>
-                        <button disabled={clickCount === 0} className={styles.submitBtn}>
+                        <button disabled={clickCount === 0 && scrollPixels === 0} className={styles.submitBtn}>
                             Submit Report to Database
                         </button>
                     </div>
