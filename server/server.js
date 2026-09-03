@@ -1,0 +1,29 @@
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
+import mongoose from "mongoose";
+import { Report } from "./models/ReportSchema.js";
+
+const app = express();
+const PORT = 3000;
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
+app.use(express.json());
+
+const MONGO_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@mousehealthlab.eqwzkrx.mongodb.net/`;
+
+mongoose
+  .connect(MONGO_URI, {
+    dbName: "mouse_health_db",
+  })
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error: ", err));
+
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
