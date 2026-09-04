@@ -5,6 +5,7 @@ import DoubleClickTest from '../Tests/DoubleClickTest/DoubleClickTest';
 import ScrollTest from '../Tests/ScrollTest/ScrollTest';
 import Sidebar from '../Sidebar/Sidebar';
 import Buttons from '../Buttons/Buttons';
+import { Modal } from 'antd';
 
 export default function MainPage() {
     const [clickCount, setClickCount] = useState(0);
@@ -90,6 +91,44 @@ export default function MainPage() {
         e.stopPropagation();
         resetAll();
     }
+
+    const handleSubmitReport = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/submit_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deviceName: selectedDevice, doubleClicks: doubleClicks, scrollGlitches: scrollGlitches })
+            });
+
+            if (response.ok) {
+                Modal.success({
+                    title: 'Report Submitted',
+                    content: (
+                        <span>
+                            Report for
+                            <strong style={{ color: '#1677ff' }}> {selectedDevice} </strong>
+                            has been successfully saved.
+                        </span>
+                    ),
+                    centered: true,
+                })
+                resetAll();
+            } else {
+                Modal.error({
+                    title: 'Submission Failed',
+                    content: 'Failed to submit report. Please try again.',
+                    centered: true,
+                })
+            }
+        } catch (error) {
+            console.error('Error submiting report: ', error);
+            Modal.error({
+                title: 'Network Error',
+                content: 'Could not connect to the server',
+                centered: true,
+            })
+        }
+    }
     return (
         <div className={styles.container}>
             <Header selectedDevice={selectedDevice} onChangeDevice={setSelectedDevice} />
@@ -110,7 +149,7 @@ export default function MainPage() {
                     )}
                 </div>
                 <div className={styles.sidebar}>
-                    <Sidebar isSubmitDisabled={clickCount === 0 && scrollPixels === 0} />
+                    <Sidebar isSubmitDisabled={clickCount === 0 && scrollPixels === 0} onSubmit={handleSubmitReport} />
                 </div>
             </div>
         </div >

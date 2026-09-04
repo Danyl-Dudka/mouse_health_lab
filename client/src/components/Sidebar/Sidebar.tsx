@@ -1,7 +1,7 @@
 import styles from './sidebar.module.css'
 import type { SidebarProps } from '../types'
 
-export default function Sidebar({ isSubmitDisabled }: SidebarProps) {
+export default function Sidebar({ isSubmitDisabled, onSubmit }: SidebarProps) {
     return (
         <>
             <div className={styles.card}>
@@ -29,7 +29,7 @@ export default function Sidebar({ isSubmitDisabled }: SidebarProps) {
                 <p className={styles.cardText}>
                     Submit these results to the Node.js backend to contribute to global hardware metrics.
                 </p>
-                <button disabled={isSubmitDisabled} className={styles.submitBtn}>
+                <button onClick={onSubmit} disabled={isSubmitDisabled} className={styles.submitBtn}>
                     Submit Report to Database
                 </button>
             </div>

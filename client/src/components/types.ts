@@ -26,4 +26,5 @@ export interface ButtonsProps {
 }
 export interface SidebarProps {
     isSubmitDisabled: boolean;
+    onSubmit: () => void;
 }
