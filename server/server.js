@@ -25,7 +25,7 @@ mongoose
 
 app.post("/submit_report", async (req, res) => {
   try {
-    const { deviceName, doubleClicks , scrollGlitches } = req.body;
+    const { deviceName, doubleClicks, scrollGlitches } = req.body;
     let status = "OK";
     if (doubleClicks > 0 || scrollGlitches > 0) {
       status = "N/G";
@@ -38,10 +38,45 @@ app.post("/submit_report", async (req, res) => {
     });
 
     await newReport.save();
-    return res.status(201).send({ message: "Report has been created successfully!" });
+    return res
+      .status(201)
+      .send({ message: "Report has been created successfully!" });
   } catch (error) {
     console.error("Error: ", error);
-    res.status(500).send({message: 'Server error!'})
+    res.status(500).send({ message: "Server error!" });
+  }
+});
+
+app.get("/analytics", async (req, res) => {
+  try {
+    const reports = await Report.find();
+    const statsMap = {};
+
+    reports.forEach(({ deviceName, status }) => {
+      if (!statsMap[deviceName]) {
+        statsMap[deviceName] = { deviceName: deviceName, total: 0, ngCount: 0 };
+      }
+
+      statsMap[deviceName].total += 1;
+
+      if (status === "N/G") {
+        statsMap[deviceName].ngCount += 1;
+      }
+    });
+
+    const result = Object.values(statsMap).map((item) => ({
+      key: item.deviceName,
+      deviceName: item.deviceName,
+      total: item.total,
+      ngCount: item.ngCount,
+      failureRate:
+        item.ngCount > 0 ? Math.round((item.ngCount / item.total) * 100) : 0,
+    }));
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching analytics:", error);
+    res.status(500).json({ message: "Error fetching analytics", error });
   }
 });
 

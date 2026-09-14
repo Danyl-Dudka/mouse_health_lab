@@ -149,7 +149,7 @@ export default function MainPage() {
                     )}
                 </div>
                 <div className={styles.sidebar}>
-                    <Sidebar isSubmitDisabled={clickCount === 0 && scrollPixels === 0} onSubmit={handleSubmitReport} />
+                    <Sidebar isSubmitDisabled={clickCount === 0 && scrollPixels === 0} onSubmit={handleSubmitReport} selectedDevice={selectedDevice} />
                 </div>
             </div>
         </div >

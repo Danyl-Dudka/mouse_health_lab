@@ -27,4 +27,12 @@ export interface ButtonsProps {
 export interface SidebarProps {
     isSubmitDisabled: boolean;
     onSubmit: () => void;
+    selectedDevice: string;
+}
+
+export interface DeviceStat {
+    deviceName: string;
+    total: number;
+    ngCount: number;
+    failureRate: number;
 }
