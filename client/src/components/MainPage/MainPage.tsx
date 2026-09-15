@@ -11,7 +11,7 @@ export default function MainPage() {
     const [clickCount, setClickCount] = useState(0);
     const [doubleClicks, setDoubleClicks] = useState(0);
 
-    const [selectedDevice, setSelectedDevice] = useState('Logitech G Pro');
+    const [selectedDevice, setSelectedDevice] = useState('');
     const [minInterval, setMinInterval] = useState<number | null>(null);
     const [activeTab, setActiveTab] = useState<'doubleClick' | 'scroll'>('doubleClick');
 
@@ -40,8 +40,16 @@ export default function MainPage() {
     }
 
     useEffect(() => {
+        const savedDevice = localStorage.getItem('selectedDevice');
+        if (savedDevice) {
+            setSelectedDevice(savedDevice)
+        }
+    }, [])
+
+    useEffect(() => {
         resetAll();
     }, [selectedDevice]);
+
 
     useEffect(() => {
         if (activeTab !== 'scroll') {
@@ -72,7 +80,12 @@ export default function MainPage() {
         return () => {
             element.removeEventListener('wheel', handleWheel)
         }
-    }, [activeTab])
+    }, [activeTab]);
+
+    const handleDeviceChange = (device: string) => {
+        setSelectedDevice(device);
+        localStorage.setItem('selectedDevice', device);
+    }
 
     const handleTestAreaClick = () => {
         const currentTime = performance.now();
@@ -111,8 +124,13 @@ export default function MainPage() {
                         </span>
                     ),
                     centered: true,
+                    onOk: () => {
+                        resetAll();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500)
+                    }
                 })
-                resetAll();
             } else {
                 Modal.error({
                     title: 'Submission Failed',
@@ -131,7 +149,7 @@ export default function MainPage() {
     }
     return (
         <div className={styles.container}>
-            <Header selectedDevice={selectedDevice} onChangeDevice={setSelectedDevice} />
+            <Header selectedDevice={selectedDevice} onChangeDevice={handleDeviceChange} />
             <div className={styles.tabs}>
                 <Buttons activeTab={activeTab} changeActiveTab={setActiveTab} />
             </div>
